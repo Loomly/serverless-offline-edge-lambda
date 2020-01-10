@@ -125,7 +125,8 @@ export class BehaviorRouter {
 						}
 					}
 
-					res.end(response.body);
+					// TODO: make encoding dynamic based on response body/content type
+					res.end(response.body, 'binary');
 				} catch (err) {
 					if (isBoom(err)) {
 						this.handleError(err, res);
