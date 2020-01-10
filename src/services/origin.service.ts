@@ -4,6 +4,8 @@ import * as fs from 'fs-extra';
 import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
+// TODO: import stream
+//const Stream = require('stream').Transform;
 
 import { parse } from 'url';
 import { toHttpHeaders } from '../utils';
@@ -34,6 +36,7 @@ export class Origin {
 		try {
 			const contents = await this.getResource(request);
 
+			// TODO: adjust content type and bodyEncoding
 			return {
 				status: '200',
 				statusDescription: '',
@@ -103,22 +106,26 @@ export class Origin {
 			hostname: baseUrl.hostname,
 			port: baseUrl.port || (baseUrl.protocol === 'https:') ? 443 : 80,
 			path: uri.path,
-			headers: {
-				...headers,
-				Connection: 'Close'
-			}
+			// headers: {
+			// 	...headers,
+			// 	Connection: 'Close'
+			// }
 		};
 
 		return new Promise((resolve, reject) => {
 			const req = httpModule.request(options, (res: http.IncomingMessage) => {
+				// TODO: define chunks as a Stream and switch to just reading chunks
 				const chunks: Uint8Array[] = [];
 
 				res.on('data', (chunk: Uint8Array) => {
 					chunks.push(chunk);
 				});
 
-				res.on('close', () => {
+				res.on('end', () => {
+					// TODO: handle error status codes (especially 400)
 					resolve(Buffer.concat(chunks).toString());
+
+					// resolve(chunks.read())
 				});
 				res.on('error', (err: Error) => reject(err));
 			});
